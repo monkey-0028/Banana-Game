@@ -4,7 +4,10 @@ from bs4 import BeautifulSoup
 import re
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from flask import Flask
+import os
 
+appi = Flask(__name__)
 # --- handling BOT ---
 # Command Handlers function
 # /start
@@ -145,15 +148,24 @@ class content:
         return m
         
 
-if __name__ == "__main__":
-    app = Application.builder().token('7845481637:AAEH9L9sLRk8DMf-ywcReGnCSxYl6PVhzyI').build()
+app = Application.builder().token('7845481637:AAEH9L9sLRk8DMf-ywcReGnCSxYl6PVhzyI').build()
 
-    app.add_handler(CommandHandler('start',start))
-    app.add_handler(CommandHandler('description',des))
-    app.add_handler(CommandHandler('status',status))
-    app.add_handler(CommandHandler('log',log))
+app.add_handler(CommandHandler('start',start))
+app.add_handler(CommandHandler('description',des))
+app.add_handler(CommandHandler('status',status))
+app.add_handler(CommandHandler('log',log))
 
-    app.run_polling()
+app.run_polling()
+
+@appi.route('/')
+def health_check():
+    return "Bot is running!"
+
+if __name__ == '__main__':
+    # Use a placeholder port that Render can detect
+    port = int(os.environ.get("PORT", 5000))
+    appi.run(host='0.0.0.0', port=port)
+   
 
 # name,url,searchUrl,resultUrl,contentSelector,contentFilterDict=Non
 # fitgirl = website("Fitgirl","https://fitgirl-repacks.site","/?s=","article .entry-title a",".entry-content ul a",{"text" : "file hoster"})
