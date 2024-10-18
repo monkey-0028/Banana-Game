@@ -153,6 +153,8 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler('status',status))
     app.add_handler(CommandHandler('log',log))
 
+    app.run_polling()
+
 # name,url,searchUrl,resultUrl,contentSelector,contentFilterDict=Non
 # fitgirl = website("Fitgirl","https://fitgirl-repacks.site","/?s=","article .entry-title a",".entry-content ul a",{"text" : "file hoster"})
 # apunkagames = website("ApunKaGames","https://www.apunkagames.com","/?s=","article .entry-title a",".entry-content a",{"href":"vlink"})
