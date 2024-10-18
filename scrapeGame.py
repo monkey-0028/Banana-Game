@@ -2,7 +2,34 @@ from urllib.request import urlopen
 from urllib.error import *
 from bs4 import BeautifulSoup
 import re
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
 
+# --- handling BOT ---
+# Command Handlers function
+# /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
+    bot = await context.bot.get_me()
+    botName = bot.first_name
+    await update.message.reply_text(f"Hi, I am {botName}\nI will search games for you!😁")
+
+# /description
+async def des(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
+    await update.message.reply_text(f"Text me name of the game and i will scrape the download-links for you")
+
+# /status
+async def status(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
+    await update.message.reply_text("NOT COMPLETE")
+
+# /log
+async def log(update: Update,context: ContextTypes.DEFAULT_TYPE)-> None:
+    await update.message.reply_text("This command is not completed yet! wait for updates.🙏")
+
+
+# ----------------
+
+
+# handling web-scraping
 class website:
     def __init__(self,name,url,searchUrl,resultUrl,contentSelector,contentFilterDict=None,gameNameSelector=None,addOnInfo=None):
         self.webName = name
@@ -101,19 +128,6 @@ class website:
             
             return content(self.webName,contentDict)
                     
-                   
-
-
-
-            
-            
-                    
-                    
-                
-
-
-    
-    
 
     
 class content:
@@ -131,14 +145,21 @@ class content:
         return m
         
 
-        
+if __name__ == "__main__":
+    app = Application.builder().token('7845481637:AAEH9L9sLRk8DMf-ywcReGnCSxYl6PVhzyI').build()
+
+    app.add_handler(CommandHandler('start',start))
+    app.add_handler(CommandHandler('description',des))
+    app.add_handler(CommandHandler('status',status))
+    app.add_handler(CommandHandler('log',log))
+
 # name,url,searchUrl,resultUrl,contentSelector,contentFilterDict=Non
-fitgirl = website("Fitgirl","https://fitgirl-repacks.site","/?s=","article .entry-title a",".entry-content ul a",{"text" : "file hoster"})
-apunkagames = website("ApunKaGames","https://www.apunkagames.com","/?s=","article .entry-title a",".entry-content a",{"href":"vlink"})
+# fitgirl = website("Fitgirl","https://fitgirl-repacks.site","/?s=","article .entry-title a",".entry-content ul a",{"text" : "file hoster"})
+# apunkagames = website("ApunKaGames","https://www.apunkagames.com","/?s=","article .entry-title a",".entry-content a",{"href":"vlink"})
 
 
-print(fitgirl.search("God of war"))
-print(apunkagames.search("God of war"))
+# print(fitgirl.search("God of war"))
+# print(apunkagames.search("God of war"))
 
 
 # -- require update -- ##
