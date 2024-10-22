@@ -3,6 +3,7 @@ from urllib.request import urlopen
 from urllib.error import *
 from bs4 import BeautifulSoup
 import re
+import csv
 # content class
 class content:
     def __init__(self,webName,contentDict):
@@ -117,3 +118,10 @@ class website:
             
             return content(self.webName,contentDict)
  
+# apun = website("ApunKaGames","https://www.apunkagames.com","/?s=","article .entry-title a",".entry-content a",{"href":"vlink"})
+# print(apun.search("god of war"))
+
+# with open("./websiteData.csv","r") as file:
+#     reader = csv.reader(file)
+#     for row in reader:
+#         print(dict(row[-1]))
