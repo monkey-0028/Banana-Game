@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes,filters,MessageHandler
-from gameScraper import website, content
+from gameScraper import website
 import os
 import ast # convert from string to python literal
 import csv
@@ -36,7 +36,7 @@ async def mainEngine(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
     with open("./websiteData.csv","r") as file:
         reader = csv.reader(file)
         for row in reader:
-            contentList.append(website(row[0],row[1],row[2],row[3],row[4],ast.literal_eval(row[5])).search(searchKey)) # fix here, number of parametes are more than provided
+            contentList.append(website(row[0],row[1],row[2],row[3],row[4],ast.literal_eval(row[5]),ast.literal_eval(row[6]),ast.literal_eval(row[7])).search(searchKey)) # parametes are here
     try:
         for item in contentList:
             await update.message.reply_text(str(item)) # if the message is too long, it throws an error. fix this shit as well. 
