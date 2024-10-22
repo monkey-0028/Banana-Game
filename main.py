@@ -36,10 +36,10 @@ async def mainEngine(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
     with open("./websiteData.csv","r") as file:
         reader = csv.reader(file)
         for row in reader:
-            contentList.append(website(row[0],row[1],row[2],row[3],row[4],ast.literal_eval(row[5])).search(searchKey))
+            contentList.append(website(row[0],row[1],row[2],row[3],row[4],ast.literal_eval(row[5])).search(searchKey)) # fix here, number of parametes are more than provided
     try:
         for item in contentList:
-            await update.message.reply_text(str(item))
+            await update.message.reply_text(str(item)) # if the message is too long, it throws an error. fix this shit as well. 
     except Exception as e:
         await update.message.reply_text(str(e))
     await update.message.reply_text("DONE")
