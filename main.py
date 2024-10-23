@@ -31,7 +31,7 @@ async def mainEngine(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
     searchKey = update.message.text
     contentList = []
     
-    await update.message.reply_text("Searching...\n(Don't panic, This may took several minutes,after you search your game, sit back and relax. we'll provide you the link as soon as possible.)")
+    await update.message.reply_text(f"Searching for <b>{searchKey}</b>...\n\n(Don't panic, This may took several minutes,after you search your game, sit back and relax. we'll provide you the link as soon as possible.)",parse_mode="HTML")
     
     with open("./websiteData.csv","r") as file:
         reader = csv.reader(file)
@@ -42,7 +42,7 @@ async def mainEngine(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
             await update.message.reply_text(str(item)) # if the message is too long, it throws an error. fix this shit as well. 
     except Exception as e:
         await update.message.reply_text(str(e))
-    await update.message.reply_text("DONE")
+    await update.message.reply_text(f"Done searching for <b>{searchKey}</b>",parse_mode="HTML")
    
 # main code
 if __name__ == "__main__":
