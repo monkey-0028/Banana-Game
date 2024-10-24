@@ -153,9 +153,10 @@ class website:
                     pass
                 else:
                     gamePageHTML = BeautifulSoup(tagURL,'html.parser')
-                    gameName = self.get_gameName(searchTag)
+                    gameName = str(self.get_gameName(searchTag))[:30]
 
                     gameINFO = content(self.webName,gameName) # content instance
+
 
                     # await update.message.reply_text(gameName)
                     button.append([InlineKeyboardButton(gameName,callback_data=f"{context.user_data['contentStack'].ptr} {gameName}")])
