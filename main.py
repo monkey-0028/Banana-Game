@@ -1,48 +1,10 @@
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes,filters,MessageHandler
+from telegram.ext import Application, CommandHandler, MessageHandler,filters,CallbackQueryHandler
 from gameScraper import website
+from Command_Handlers import *
 import os
-import ast # convert from string to python literal
-import csv
 
-# --- handling BOT ---
-# Command Handlers function
-# /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
-    bot = await context.bot.get_me()
-    botName = bot.first_name
-    await update.message.reply_text(f"Hi, I am {botName}\nI will search games for you!😁")
 
-# /description
-async def des(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
-    await update.message.reply_text(f"Text me name of the game and i will scrape the download-links for you")
 
-# /status
-async def status(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
-    await update.message.reply_text("NOT COMPLETE")
-
-# /log
-async def log(update: Update,context: ContextTypes.DEFAULT_TYPE)-> None:
-    await update.message.reply_text("This command is not completed yet! wait for updates.🙏")
-
-# /messageHandler mainEngine
-
-async def mainEngine(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
-    searchKey = update.message.text
-    contentList = []
-    
-    await update.message.reply_text(f"Searching for <b>{searchKey}</b>...\n\n(Don't panic, This may took several minutes,after you search your game, sit back and relax. we'll provide you the link as soon as possible.)",parse_mode="HTML")
-    
-    with open("./websiteData.csv","r") as file:
-        reader = csv.reader(file)
-        for row in reader:
-            contentList.append(website(row[0],row[1],row[2],row[3],row[4],ast.literal_eval(row[5]),ast.literal_eval(row[6]),ast.literal_eval(row[7])).search(searchKey)) # parametes are here
-    try:
-        for item in contentList:
-            await update.message.reply_text(str(item)) # if the message is too long, it throws an error. fix this shit as well. 
-    except Exception as e:
-        await update.message.reply_text(str(e))
-    await update.message.reply_text(f"Done searching for <b>{searchKey}</b>",parse_mode="HTML")
    
 # main code
 if __name__ == "__main__":
@@ -56,15 +18,22 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler('status',status))
     app.add_handler(CommandHandler('log',log))
 
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,mainEngine))
+    apunkagames = website("Fitgirl","https://fitgirl-repacks.site","/?s=","article .entry-title a",".entry-content ul a",{'text' : 'file hoster'},None,None)
+    gamestack = contentStack
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,apunkagames.search))
+
+    app.add_handler(CallbackQueryHandler(contentStackItem_return))
 
     app.run_polling()
 
    
+
 '''
-1. Provide Click and download link (for this i have to make my script crawl through link; make a general system applicable for most website)
-2. Also do the checking wether the link is dead or not
-3. Error handeling including void field
-4. Expand the search (crawl through the whole website to find all search) # Create a "Crawler" method to manage this work
-5. Handle additional information if available (eg. platform(ps4/ps3/pc), region: Jap/US etc)
+1. change the structure of game content (make it pure list)
+2. store the ptr in function(search) itself. and make sure everytime search runs, it start from 0
+3. make sure that contentStack also became empty as search runs.
+4. Handle the click of previous inlineButtons, whose data have been removed.
+5. but search is specific to one website only. if more than one website is run. it will wipe the previous daata from website
+6. but if you choose to keep the data then it'll keep the data from very old search as well.
 '''
+

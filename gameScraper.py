@@ -3,21 +3,59 @@ from urllib.request import urlopen
 from urllib.error import *
 from bs4 import BeautifulSoup
 import re
-import csv
+from telegram import Update,InlineKeyboardButton,InlineKeyboardMarkup
+from telegram.ext import ContextTypes
+
+
 # content class
 class content:
-    def __init__(self,webName,contentDict):
+    def __init__(self,webName,gameName): # will add image in future
         self.webName = webName
-        self.contentDict = contentDict # {gameName: [link-tag]}
+        self.gameName = gameName
+        self.gameLink = []
     
     def __str__(self):
-        m = f"Website: {self.webName}\n\n"
-        for element in self.contentDict:
-            m += "\t"+element
-            for link in self.contentDict[element]:
-                m += f"\n\t\t{link}"
-            m += "\n\n"
-        return m
+        if self.gameLink == []:
+            return "NO LINK FOUND"
+        else:
+            rVal = f"Website: {self.webName}\nGame: {self.gameName}\n\n"
+            for item in self.gameLink:
+                rVal += item + "\n"
+        return rVal
+
+#contentStack class
+class contentStack:
+    def __init__(self):
+        self.data = []
+        self.ptr = 0
+        self.key = ""
+    
+    def push(self,data:content,key)->None:
+        # if data in self.data: # this line saves a lot of space
+        #     return
+        
+        if self.key == key:
+            self.data.append(data)
+            self.ptr+=1
+        else:
+            self.data = [data]
+            self.key = key
+            self.ptr = 1
+
+    def isExist(self,p,string) -> bool:
+        if self.data[p].gameName == string:
+            return True
+        return False
+    
+    def is_empty(self)->None:
+        if self.data == {}:
+            return True
+        return False
+        
+
+
+    
+    
 
 # website class
 class website:
@@ -76,7 +114,13 @@ class website:
         return True
                 
     
-    def search(self,key):
+    async def search(self,update:Update,context:ContextTypes.DEFAULT_TYPE) -> None:
+        if 'contentStack'  not in context.user_data:
+            await update.message.reply_text("First start the bot!!")
+            return
+        
+        key = update.message.text
+        await update.message.reply_text(f"Searching for <b>{key}</b>\n Don't panic, It may take several minutes.",parse_mode="HTML")
         try:
             url = urlopen(self.webUrl+self.webSearchUrl+(key.replace(" ","+")))
         except HTTPError as e0:
@@ -95,7 +139,12 @@ class website:
                 pass
 
             #iterating each link
-            contentDict = dict()
+            button = []
+            start_message = f"Seaching in <b><a href='{self.webUrl}'>{self.webName}</a></b>"
+            m = await update.message.reply_text(start_message,parse_mode="HTML")
+            messageID = m.message_id
+            chatID = update.message.chat_id
+
             for searchTag in searchTagList:
                 try:
                     tagURL = urlopen(self.get_url(searchTag.attrs['href']))
@@ -105,6 +154,20 @@ class website:
                 else:
                     gamePageHTML = BeautifulSoup(tagURL,'html.parser')
                     gameName = self.get_gameName(searchTag)
+
+                    gameINFO = content(self.webName,gameName) # content instance
+
+                    # await update.message.reply_text(gameName)
+                    button.append([InlineKeyboardButton(gameName,callback_data=f"{context.user_data['contentStack'].ptr} {gameName}")])
+                    
+                    await context.bot.edit_message_text(
+                        message_id=messageID,
+                        chat_id=chatID,
+                        text=start_message,
+                        reply_markup=InlineKeyboardMarkup(button),
+                        parse_mode="HTML"
+                    )
+
                     tagURL.close()
                     contentTagList = gamePageHTML.select(self.contentSelector)
                     if not self.contentFilterDict == None:
@@ -114,9 +177,13 @@ class website:
                         attrDict = item.attrs
                         if "href" in attrDict:
                             listOFlink.append(attrDict["href"])
-                    contentDict[gameName] = listOFlink
+                    gameINFO.gameLink = listOFlink
+                    context.user_data['contentStack'].push(gameINFO,key)
+            await update.message.reply_text(f"Done searching in <b>{self.webName}</b>",parse_mode="HTML")
             
-            return content(self.webName,contentDict)
+                    
+            
+            
  
 # apun = website("ApunKaGames","https://www.apunkagames.com","/?s=","article .entry-title a",".entry-content a",{"href":"vlink"})
 # print(apun.search("god of war"))
