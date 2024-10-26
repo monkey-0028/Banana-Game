@@ -7,12 +7,7 @@ import ast
 
 CSV_FILE = "./websiteData.csv"
 async def enable_multiWebSearch(update:Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['contentStack'] = contentStack()
-    context.user_data['SearchLoop_flag'] = False 
     context.user_data['Message_flag'] = True # True means it will allow message else not
-
-    key = update.message.text
-
     global CSV_FILE
     with open(CSV_FILE, "r") as file:
         reader = csv.reader(file)

@@ -99,9 +99,9 @@ class website:
                 
     
     async def search(self,update:Update,context:ContextTypes.DEFAULT_TYPE) -> None:
-        # if 'contentStack'  not in context.user_data:
-        #     await update.message.reply_text("First start the bot!!")
-        #     return
+        if 'contentStack'  not in context.user_data:
+            await update.message.reply_text("First start the bot!!")
+            return
         
         key = update.message.text
         if context.user_data['Message_flag']:
