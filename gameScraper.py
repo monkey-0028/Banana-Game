@@ -20,7 +20,7 @@ class content:
         else:
             rVal = f"Website: {self.webName}\nGame: {self.gameName}\n\n"
             for item in self.gameLink:
-                rVal += item + "\n"
+                rVal += item + "\n\n"
         return rVal
 
 #contentStack class
