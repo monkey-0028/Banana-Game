@@ -20,37 +20,22 @@ class content:
         else:
             rVal = f"Website: {self.webName}\nGame: {self.gameName}\n\n"
             for item in self.gameLink:
-                rVal += item + "\n\n"
+                rVal += item + "\n"
         return rVal
 
 #contentStack class
 class contentStack:
     def __init__(self):
-        self.data = []
+        self.data = dict() # index: content-object
         self.ptr = 0
-        self.key = ""
+        self.Completed_Search_Loop_flag:bool = False
     
     def push(self,data:content,key)->None:
         # if data in self.data: # this line saves a lot of space
         #     return
-        
-        if self.key == key:
-            self.data.append(data)
-            self.ptr+=1
-        else:
-            self.data = [data]
-            self.key = key
-            self.ptr = 1
-
-    def isExist(self,p,string) -> bool:
-        if self.data[p].gameName == string:
-            return True
-        return False
+        self.data[self.ptr] = data
+        self.ptr += 1
     
-    def is_empty(self)->None:
-        if self.data == {}:
-            return True
-        return False
         
 
 
@@ -157,6 +142,10 @@ class website:
 
                     gameINFO = content(self.webName,gameName) # content instance
 
+                    # content-Stack state check
+                    if context.user_data['contentStack'].Completed_Search_Loop_flag == True:
+                        context.user_data['contentStack'].__init__()
+
 
                     # await update.message.reply_text(gameName)
                     button.append([InlineKeyboardButton(gameName,callback_data=f"{context.user_data['contentStack'].ptr} {gameName}")])
@@ -181,6 +170,7 @@ class website:
                     gameINFO.gameLink = listOFlink
                     context.user_data['contentStack'].push(gameINFO,key)
             await update.message.reply_text(f"Done searching in <b>{self.webName}</b>",parse_mode="HTML")
+            context.user_data['contentStack'].Completed_Search_Loop_flag = True
             
                     
             

@@ -22,21 +22,21 @@ async def log(update: Update,context: ContextTypes.DEFAULT_TYPE)-> None:
     await update.message.reply_text("This command is not completed yet! wait for updates.🙏")
 
 async def contentStackItem_return(update:Update,context:ContextTypes.DEFAULT_TYPE)->None:
-     
+
     query = update.callback_query
     await query.answer("Fetching Data")
-    chatId = query.message.chat.id if query.message else query.from_user.id
-    
-    gameStack = context.user_data['contentStack']
-    query_data = (query.data).split(' ',1) # [ptr,gameName]
-    query_data[0] = int(query_data[0])
 
-  #for debugging  
-    # for item in gameStack.data:
-    #     print(item)
+    chatID = query.message.chat.id if query.message else query.from_user.id
 
-    if gameStack.isExist(query_data[0],query_data[1]):
-        gameInfo = str(gameStack.data[query_data[0]])
-        await context.bot.send_message(chat_id=chatId,text=gameInfo)
+    contentDict = (context.user_data['contentStack']).data
+    callbackData = (query.data).split(' ',1) # [ptr,gameName]
+    callbackData[0] = int(callbackData[0])
+    # print(callbackData)
+    # print(contentDict)
+    if callbackData[0] in contentDict:
+        if contentDict[callbackData[0]].gameName == callbackData[1]:
+            await context.bot.send_message(chat_id=chatID, text=str(contentDict[callbackData[0]]))
+        else:
+            await context.bot.send_message(chat_id=chatID, text="can't find this content")
     else:
-        await context.bot.send_message(chat_id=chatId,text="THIS LINK HAS BEEN EXPIRED")
+        await context.bot.send_message(chat_id=chatID, text="LINK EXPIRED")
