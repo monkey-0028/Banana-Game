@@ -6,7 +6,6 @@ from gameScraper import contentStack
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE)->None:
     bot = await context.bot.get_me()
     botName = bot.first_name
-    context.user_data['contentStack'] = contentStack()
     await update.message.reply_text(f"Hi, I am {botName}\nI will search games for you!😁")
 
 # /description

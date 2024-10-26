@@ -2,7 +2,25 @@ from telegram.ext import Application, CommandHandler, MessageHandler,filters,Cal
 from gameScraper import website
 from Command_Handlers import *
 import os
+import csv
+import ast
 
+CSV_FILE = "./websiteData.csv"
+async def enable_multiWebSearch(update:Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['contentStack'] = contentStack()
+    context.user_data['SearchLoop_flag'] = False 
+    context.user_data['Message_flag'] = True # True means it will allow message else not
+
+    key = update.message.text
+
+    global CSV_FILE
+    with open(CSV_FILE, "r") as file:
+        reader = csv.reader(file)
+
+        for row in reader:
+            await website(row[0],row[1],row[2],row[3],row[4],ast.literal_eval(row[5]),ast.literal_eval(row[6]),ast.literal_eval(row[7])).search(update,context)
+        context.user_data['SearchLoop_flag'] = True
+        
 
 
    
@@ -19,8 +37,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler('log',log))
 
     apunkagames = website("Fitgirl","https://fitgirl-repacks.site","/?s=","article .entry-title a",".entry-content ul a",{'text' : 'file hoster'},None,None)
-    gamestack = contentStack
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,apunkagames.search))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,enable_multiWebSearch))
 
     app.add_handler(CallbackQueryHandler(contentStackItem_return))
 

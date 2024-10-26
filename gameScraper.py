@@ -28,7 +28,6 @@ class contentStack:
     def __init__(self):
         self.data = dict() # index: content-object
         self.ptr = 0
-        self.Completed_Search_Loop_flag:bool = False
     
     def push(self,data:content,key)->None:
         # if data in self.data: # this line saves a lot of space
@@ -100,12 +99,14 @@ class website:
                 
     
     async def search(self,update:Update,context:ContextTypes.DEFAULT_TYPE) -> None:
-        if 'contentStack'  not in context.user_data:
-            await update.message.reply_text("First start the bot!!")
-            return
+        # if 'contentStack'  not in context.user_data:
+        #     await update.message.reply_text("First start the bot!!")
+        #     return
         
         key = update.message.text
-        await update.message.reply_text(f"Searching for <b>{key}</b>\n Don't panic, It may take several minutes.",parse_mode="HTML")
+        if context.user_data['Message_flag']:
+            await update.message.reply_text(f"Searching for <b>{key}</b>\n Don't panic, It may take several minutes.",parse_mode="HTML")
+            context.user_data['Message_flag'] = False
         try:
             url = urlopen(self.webUrl+self.webSearchUrl+(key.replace(" ","+")))
         except HTTPError as e0:
@@ -143,8 +144,9 @@ class website:
                     gameINFO = content(self.webName,gameName) # content instance
 
                     # content-Stack state check
-                    if context.user_data['contentStack'].Completed_Search_Loop_flag == True:
+                    if context.user_data['SearchLoop_flag'] == True:
                         context.user_data['contentStack'].__init__()
+                        context.user_data['SearchLoop_flag'] = False
 
 
                     # await update.message.reply_text(gameName)
@@ -170,16 +172,4 @@ class website:
                     gameINFO.gameLink = listOFlink
                     context.user_data['contentStack'].push(gameINFO,key)
             await update.message.reply_text(f"Done searching in <b>{self.webName}</b>",parse_mode="HTML")
-            context.user_data['contentStack'].Completed_Search_Loop_flag = True
             
-                    
-            
-            
- 
-# apun = website("ApunKaGames","https://www.apunkagames.com","/?s=","article .entry-title a",".entry-content a",{"href":"vlink"})
-# print(apun.search("god of war"))
-
-# with open("./websiteData.csv","r") as file:
-#     reader = csv.reader(file)
-#     for row in reader:
-#         print(dict(row[-1]))
